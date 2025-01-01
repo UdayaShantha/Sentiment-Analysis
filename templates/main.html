@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Analysis App</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" integrity="sha384-QnbTpw0Cd1vTbzHhaCxxG3oW0N2kzKQvkkLvN5K+hiAjQp1hZ2DgfGP+OJ9roXz1" crossorigin="anonymous">
+    <link rel="stylesheet" href="templates/main.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f4f4f9, #e3f2fd);
+        }
+
+        .split {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            width: 50%;
+            position: fixed;
+            top: 0;
+            overflow-x: hidden;
+        }
+
+        .left {
+            left: 0;
+            background: linear-gradient(135deg, #90caf9, #e3f2fd);
+            color: white;
+            animation: fadeInLeft 1.5s;
+        }
+
+        .right {
+            right: 0;
+            background: linear-gradient(135deg, #ffffff, #fafafa);
+            overflow-y: auto;
+            padding: 20px;
+            animation: fadeInRight 1.5s;
+        }
+
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .centered img {
+            max-width: 80%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, filter 0.3s ease;
+        }
+
+        .centered img:hover {
+            transform: scale(1.05);
+            filter: brightness(1.1);
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            font-size: 16px;
+            resize: none;
+            transition: box-shadow 0.3s ease;
+        }
+
+        textarea:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+
+        .comment-section {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fafafa;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 1.5s;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .comment-section hr {
+            margin: 10px 0;
+            border-top: 1px solid #ccc;
+        }
+
+        .commented-section span {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .title {
+            font-size: 28px;
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            animation: bounceIn 1.5s;
+        }
+
+        @keyframes bounceIn {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-20px);
+            }
+            60% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .split {
+                width: 100%;
+                position: relative;
+            }
+
+            .left,
+            .right {
+                height: auto;
+                width: 100%;
+            }
+
+            .left {
+                padding: 20px;
+            }
+
+            .right {
+                padding: 10px;
+            }
+
+            .comment-section {
+                max-height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="split left">
+        <div class="centered">
+            <img src="/static/images/prod1.jpg" alt="Product Image">
+        </div>
+    </div>
+
+    <div class="split right">
+        <div class="container">
+            <div class="title">Sentiment Analysis Dashboard</div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="mb-3">
+                        <label class="fw-bold text-primary">Positive Sentiments:</label>
+                        <span class="text-success fw-bold">{{ data.positive }}</span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="fw-bold text-danger">Negative Sentiments:</label>
+                        <span class="text-danger fw-bold">{{ data.negative }}</span>
+                    </div>
+                    <form method="post">
+                        <div class="mb-3">
+                            <textarea name="text" placeholder="Enter your comment here..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="comment-section">
+                {% for review in data.reviews %}
+                <div class="commented-section mt-3">
+                    <div class="text-nowrap bd-highlight">
+                        <span>{{ review }}</span>
+                    </div>
+                    <hr />
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
